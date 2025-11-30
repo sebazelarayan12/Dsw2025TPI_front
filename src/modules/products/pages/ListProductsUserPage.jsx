@@ -64,7 +64,7 @@ function ListProductsUserPage() {
       if (error) throw error;
 
       setTotal(data.total);
-      setProducts(data.productItems);
+      setProducts(data.productItems || []);
     } finally {
       setLoading(false);
     }

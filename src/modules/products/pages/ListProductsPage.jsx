@@ -32,7 +32,7 @@ function ListProductsPage() {
         if (error) throw error;
 
         setTotal(data.total);
-        setProducts(data.productItems);
+        setProducts(data.productItems || []);
       } catch (error) {
         console.error(error);
       } finally {

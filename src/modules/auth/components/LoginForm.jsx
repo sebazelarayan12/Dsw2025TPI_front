@@ -50,7 +50,6 @@ function LoginForm({ onSuccess }) {
 
       if (backendError) {
         const detailedMessages = (backendError.errors || [])
-          .map((e) => frontendErrorMessage[e.code] || e.message)
           .filter(Boolean);
 
         setErrorMessages(detailedMessages);
