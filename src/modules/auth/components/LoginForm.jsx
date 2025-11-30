@@ -17,11 +17,11 @@ function LoginForm({ onSuccess }) {
   } = useForm({ defaultValues: { username: '', password: '' } });
 
   const navigate = useNavigate();
-  const { singin } = useAuth();
+  const { singIn } = useAuth();
 
   const onValid = async (formData) => {
     try {
-      const { error } = await singin(formData.username, formData.password);
+      const { error } = await singIn(formData.username, formData.password);
 
       if (error) {
         const detailedMessages = (error.errors || [])
