@@ -6,7 +6,7 @@ import Button from '../../shared/components/Button';
 import useAuth from '../hooks/useAuth';
 import { frontendErrorMessage } from '../helpers/backendError';
 
-function LoginForm({ onSuccess }) {
+function RegisterForm({ onSuccess, fixedRole }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
 
@@ -14,14 +14,19 @@ function LoginForm({ onSuccess }) {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ defaultValues: { username: '', password: '' } });
+    getValues,
+  } = useForm();
 
   const navigate = useNavigate();
-  const { singin } = useAuth();
+  const { register: registerUser } = useAuth();
 
-  const onValid = async (formData) => {
+  const onValid = async ({ username, password, email, role }) => {
+    setErrorMessage('');
+    setErrorMessages([]);
+    const finalRole = fixedRole ?? role;
+
     try {
-      const { error } = await singin(formData.username, formData.password);
+      const { error } = await registerUser(username, password, email, finalRole);
 
       if (error) {
         const detailedMessages = (error.errors || [])
@@ -33,20 +38,18 @@ function LoginForm({ onSuccess }) {
           error.frontendErrorMessage
           || detailedMessages[0]
           || error.backendMessage
-          || 'Llame a soporte',
+          || 'No se pudo completar el registro',
         );
 
         return;
       }
 
-      // Si el form se está usando dentro de un modal
       if (onSuccess) return onSuccess();
 
-      // Si no, navegación normal (admin)
-      navigate('/admin/home');
+      navigate('/login');
 
-    } catch (error) {
-      const backendError = error.backendError;
+    } catch (err) {
+      const backendError = err.backendError;
 
       if (backendError) {
         const detailedMessages = (backendError.errors || [])
@@ -82,39 +85,56 @@ function LoginForm({ onSuccess }) {
       "
       onSubmit={handleSubmit(onValid)}
     >
-      {/* Usuario */}
+
       <Input
         label="Usuario"
         {...register('username', { required: 'Usuario es obligatorio' })}
         error={errors.username?.message}
       />
 
-      {/* Contraseña */}
+      <Input
+        label="Email"
+        {...register('email', { required: 'Email es obligatorio' })}
+        error={errors.email?.message}
+      />
+
       <Input
         label="Contraseña"
-        {...register('password', { required: 'Contraseña es obligatorio' })}
         type="password"
+        {...register('password', { required: 'Contraseña obligatoria' })}
         error={errors.password?.message}
       />
 
-      {/* Botones */}
-      <div className="flex flex-col gap-4">
-        <Button type="submit">Iniciar Sesión</Button>
+      <Input
+        label="Confirmar Contraseña"
+        type="password"
+        {...register('confirmPassword', {
+          required: 'Confirmación obligatoria',
+          validate: (v) => v === getValues('password') || 'Las contraseñas no coinciden',
+        })}
+        error={errors.confirmPassword?.message}
+      />
 
-        {/* Solo mostrar el de registrar si NO es modal */}
-        {!onSuccess && (
-          <Button
-            type="button"
-            onClick={() => navigate('/register')}
-            className="bg-gray-200 text-gray-700 hover:bg-gray-300"
+      {!fixedRole && (
+        <div className="flex flex-col gap-1">
+          <label className="text-md font-medium text-gray-600">Rol</label>
+
+          <select
+            className="border rounded-lg p-2 text-gray-700"
+            {...register('role', { required: 'El rol es obligatorio' })}
           >
-            Registrarse
-          </Button>
-        )}
-      </div>
+            <option value="Client">Cliente</option>
+            <option value="Admin">Admin</option>
+          </select>
+
+          {errors.role?.message && (
+            <p className="text-red-500 text-sm">{errors.role.message}</p>
+          )}
+        </div>
+      )}
 
       {errorMessage && (
-        <p className="text-red-500 text-sm text-center">{errorMessage}</p>
+        <p className="text-red-500 text-center text-sm">{errorMessage}</p>
       )}
       {errorMessages.length > 0 && (
         <ul className="text-red-500 text-sm list-disc list-inside space-y-1">
@@ -123,8 +143,19 @@ function LoginForm({ onSuccess }) {
           ))}
         </ul>
       )}
+
+      {/* Botón principal */}
+      <Button type="submit">Registrarse</Button>
+
+      {/*botón para volver al login */}
+      {!onSuccess && (
+        <Button type="button" onClick={() => navigate('/login')}>
+          Iniciar Sesión
+        </Button>
+      )}
+
     </form>
   );
 }
 
-export default LoginForm;
+export default RegisterForm;

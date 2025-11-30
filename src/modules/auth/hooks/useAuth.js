@@ -5,15 +5,11 @@ const useAuth = () => {
   const context = useContext(AuthContext);
 
   if (!context) {
-    new Error('useAuth no debe ser usado por fuera de AuthProvider');
+    throw new Error('useAuth no debe ser usado por fuera de AuthProvider');
   }
 
-  return {
-    isAuthenticated: context.isAuthenticated,
-    singin: context.singin,
-    singout: context.singout,
-  };
-
+  return context;
 };
 
 export default useAuth;
+
