@@ -1,4 +1,4 @@
-const frontendErrorMessage = {
+/*const frontendErrorMessage = {
   // Login / auth
   1000: 'Usuario y/o contraseña no son correctos',
   1001: 'Hay información inválida en el formulario. Revisa los campos e inténtalo nuevamente.',
@@ -23,4 +23,4 @@ const frontendErrorMessage = {
 
 export {
   frontendErrorMessage,
-};
+}; */ 

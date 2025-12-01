@@ -11,7 +11,7 @@ export default function MobileSideMenu({
   onOpenRegister,
   totalItems = 0,
 }) {
-  const { isAuthenticated, user, singout } = useAuth();
+  const { isAuthenticated, user, signout } = useAuth();
 
   return (
     <div
@@ -59,7 +59,7 @@ export default function MobileSideMenu({
           </Button>
         </>
       ) : (
-        <Button className="text-xl mt-4 w-full" onClick={() => { singout(); onClose(); }}>
+        <Button className="text-xl mt-4 w-full" onClick={() => { signout(); onClose(); }}>
           Cerrar sesión
         </Button>
       )}

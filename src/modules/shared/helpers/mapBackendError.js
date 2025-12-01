@@ -1,64 +1,58 @@
-const DEFAULT_ERROR_MESSAGE = 'Llame a soporte';
-
-const normalizeErrors = (errors = []) => {
-  if (!Array.isArray(errors)) {
-    return [];
-  }
-
-  return errors.map((error) => ({
-    code: error.code ?? error.Code ?? null,
-    message: error.message ?? error.Message ?? '',
-  }));
-};
-
-const buildDetail = (detail, title, normalizedErrors) => {
-  if (detail) return detail;
-
-  const fromErrors = normalizedErrors
-    .map((err) => err.message)
-    .filter(Boolean)
-    .join(' ');
-
-  if (fromErrors) return fromErrors;
-
-  return title || '';
-};
+const DEFAULT_ERROR_MESSAGE = 'Ocurrió un error inesperado. Intente nuevamente.';
 
 /**
- * Normaliza el error que devuelve el backend a un formato comun:
- * {
- *   code: number | null,
- *   errors: [{ code, message }],
- *   frontendErrorMessage: string
- * }
+ * Parsea errores de .NET API (ProblemDetails, excepciones o strings simples)
  */
-const mapBackendError = (errorLike, frontendMessages = {}, fallbackMessage = DEFAULT_ERROR_MESSAGE) => {
-  const raw = errorLike?.response?.data ?? errorLike ?? {};
-  const errors = normalizeErrors(raw.errors);
-  const code = raw.internalCode ?? raw.code ?? errors[0]?.code ?? null;
-  const detail = buildDetail(raw.detail, raw.title, errors);
-
-  const backendMessage = detail || fallbackMessage;
-  const hasSpecificErrors = errors.length > 0;
-
-  // Mensaje preferido: solo usamos el mapeo general cuando no hay errores detallados.
-  let frontendMessage = (code && frontendMessages[code]) || null;
-
-  // Caso especial: el backend devuelve 1001 pero trae errores con codigos especificos (2000s, etc.)
-  // No mostrar el mensaje generico 1001 si tenemos errores puntuales.
-  if (code === 1001 && hasSpecificErrors) {
-    frontendMessage = null;
+const mapBackendError = (error) => {
+  // 1. Si no hay respuesta del servidor (ej: red caída)
+  if (!error.response) {
+    return {
+      message: 'No se pudo conectar con el servidor.',
+      isNetworkError: true
+    };
   }
 
-  return {
-    ...raw,
-    code,
-    errors,
-    backendMessage,
-    frontendErrorMessage: frontendMessage,
-  };
+  const { data, status } = error.response;
+
+  // 2. Caso: El backend devuelve un string directo (ej: return BadRequest("Error..."))
+  if (typeof data === 'string') {
+    return { message: data };
+  }
+
+  // 3. Caso: Excepciones de .NET (ProblemDetails estándar)
+  // Suelen tener 'detail', 'title' o 'errors' (validacion de ModelState)
+  
+  // Prioridad A: Mensaje específico de validación (errors: { Campo: ["Error"] })
+  if (data.errors && typeof data.errors === 'object') {
+    // Tomamos el primer error de validación que encontremos
+    const firstErrorKey = Object.keys(data.errors)[0];
+    const firstErrorMessage = data.errors[firstErrorKey]?.[0];
+    if (firstErrorMessage) {
+      return { message: firstErrorMessage };
+    }
+  }
+
+  // Prioridad B: Campo 'detail' (común en excepciones manejadas)
+  if (data.detail) {
+    return { message: data.detail };
+  }
+
+  // Prioridad C: Campo 'title' (ej: "One or more validation errors occurred.")
+  if (data.title) {
+    // A veces el title es muy genérico, tratamos de evitarlo si es el de validación
+    if (data.title !== "One or more validation errors occurred.") {
+      return { message: data.title };
+    }
+  }
+
+  // 4. Fallback por código de estado HTTP
+  if (status === 401) return { message: 'No autorizado. Inicie sesión nuevamente.' };
+  if (status === 403) return { message: 'No tiene permisos para realizar esta acción.' };
+  if (status === 404) return { message: 'El recurso solicitado no existe.' };
+  if (status === 500) return { message: 'Error interno del servidor.' };
+
+  // 5. Default
+  return { message: DEFAULT_ERROR_MESSAGE };
 };
 
-export {
-  mapBackendError,
-};
+export { mapBackendError };

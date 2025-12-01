@@ -21,7 +21,7 @@ function AuthProvider({ children }) {
     return Boolean(token);
   });
 
-  const singin = async (username, password) => {
+  const signin = async (username, password) => {
     const { data, error } = await login(username, password);
 
     if (error) {
@@ -38,7 +38,7 @@ function AuthProvider({ children }) {
     return { error: null };
   };
 
-  const singout = () => {
+  const signout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
@@ -55,8 +55,8 @@ function AuthProvider({ children }) {
       value={{
         isAuthenticated,
         user,
-        singin,
-        singout,
+        signin,
+        signout,
         register,
       }}
     >

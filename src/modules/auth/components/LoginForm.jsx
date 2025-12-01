@@ -4,73 +4,56 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../../shared/components/Input';
 import Button from '../../shared/components/Button';
 import useAuth from '../hooks/useAuth';
-import { frontendErrorMessage } from '../helpers/backendError';
 
 function LoginForm({ onSuccess }) {
-  const [errorMessage, setErrorMessage] = useState('');
-  const [errorMessages, setErrorMessages] = useState([]);
+  // Simplificamos el estado de error a un solo string, 
+  // ya que el helper mapBackendError nos da el mensaje procesado.
+  const [globalError, setGlobalError] = useState('');
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ defaultValues: { username: '', password: '' } });
 
   const navigate = useNavigate();
-  const { singin } = useAuth();
+  
+  // 1. CORRECCIÓN: Usamos 'signIn' (como se llama en AuthProvider)
+  const { signin } = useAuth();
 
   const onValid = async (formData) => {
+    setGlobalError(''); // Limpiar errores previos
+    
     try {
-      const { error } = await singin(formData.username, formData.password);
+      // Llamamos al signIn
+      // Gracias a tu nuevo login.js y mapBackendError, 'error' ya trae { message: "..." }
+      const { error } = await signin(formData.username, formData.password);
 
       if (error) {
-        const detailedMessages = (error.errors || [])
-          .map((err) => frontendErrorMessage[err.code] || err.message)
-          .filter(Boolean);
-
-        setErrorMessages(detailedMessages);
-        setErrorMessage(
-          error.frontendErrorMessage
-          || detailedMessages[0]
-          || error.backendMessage
-          || 'Llame a soporte',
-        );
-
+        // 2. CORRECCIÓN: Leemos directamente el mensaje procesado
+        setGlobalError(error.message || 'Ocurrió un error inesperado');
         return;
       }
 
-      // Si el form se está usando dentro de un modal
-      if (onSuccess) return onSuccess();
-
-      // Si no, navegación normal (admin)
-      navigate('/admin/home');
-
-    } catch (error) {
-      const backendError = error.backendError;
-
-      if (backendError) {
-        const detailedMessages = (backendError.errors || [])
-          .filter(Boolean);
-
-        setErrorMessages(detailedMessages);
-        setErrorMessage(
-          backendError.frontendErrorMessage
-          || detailedMessages[0]
-          || backendError.backendMessage
-          || 'Llame a soporte',
-        );
-
-        return;
+      // Éxito
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        // 3. Navegación al Dashboard
+        navigate('/admin'); 
       }
 
-      setErrorMessage('Llame a soporte');
+    } catch (err) {
+      // Catch de seguridad por si explota algo fuera del servicio
+      setGlobalError('Error crítico en la aplicación.');
+      console.error(err);
     }
   };
 
   return (
     <form
       className="
-        flex flex-col gap-8
+        flex flex-col gap-6
         bg-white
         p-8
         rounded-xl
@@ -81,47 +64,47 @@ function LoginForm({ onSuccess }) {
       "
       onSubmit={handleSubmit(onValid)}
     >
+      <h2 className="text-2xl font-bold text-center text-gray-800">Bienvenido</h2>
+
       {/* Usuario */}
       <Input
         label="Usuario"
-        {...register('username', { required: 'Usuario es obligatorio' })}
+        {...register('username', { required: 'El usuario es obligatorio' })}
         error={errors.username?.message}
       />
 
       {/* Contraseña */}
       <Input
         label="Contraseña"
-        {...register('password', { required: 'Contraseña es obligatorio' })}
         type="password"
+        {...register('password', { required: 'La contraseña es obligatoria' })}
         error={errors.password?.message}
       />
 
-      {/* Botones */}
-      <div className="flex flex-col gap-4">
-        <Button type="submit">Iniciar Sesión</Button>
+      {/* Mensaje de Error del Backend */}
+      {globalError && (
+        <div className="p-3 text-sm text-red-600 bg-red-50 rounded border border-red-200 text-center">
+          {globalError}
+        </div>
+      )}
 
-        {/* Solo mostrar el de registrar si NO es modal */}
+      {/* Botones */}
+      <div className="flex flex-col gap-3 mt-2">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Ingresando...' : 'Iniciar Sesión'}
+        </Button>
+
+        {/* Solo mostrar el de registrar si NO es modal (o según tu diseño) */}
         {!onSuccess && (
           <Button
             type="button"
-            onClick={() => navigate('/register')}
-            className="bg-gray-200 text-gray-700 hover:bg-gray-300"
+            onClick={() => navigate('/signup')} // Asegurate que esta ruta exista en App.jsx
+            className="bg-gray-100 text-gray-700 hover:bg-gray-200 mt-2"
           >
             Registrarse
           </Button>
         )}
       </div>
-
-      {errorMessage && (
-        <p className="text-red-500 text-sm text-center">{errorMessage}</p>
-      )}
-      {errorMessages.length > 0 && (
-        <ul className="text-red-500 text-sm list-disc list-inside space-y-1">
-          {errorMessages.map((msg, idx) => (
-            <li key={idx}>{msg}</li>
-          ))}
-        </ul>
-      )}
     </form>
   );
 }
