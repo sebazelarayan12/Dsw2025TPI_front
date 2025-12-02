@@ -30,10 +30,20 @@ function ListOrdersPage() {
     try {
       setLoading(true);
       const { data, error } = await getOrders(searchTerm, status, pageNumber, pageSize);
+      
       if (error) throw error;
 
-      setTotal(data.totalCount);      
-    setOrders(data.items ?? []);
+      // CORRECCIÓN CRÍTICA: Adaptar a la respuesta real del backend
+      // Si 'data' es un array, lo usamos directo. Si es objeto, buscamos 'items'.
+      const ordersList = Array.isArray(data) ? data : (data.items || []);
+      
+      // Si el backend no devuelve el totalCount, usamos la longitud del array 
+      // (aunque esto solo sirve si no hay paginación real en el servidor)
+      const totalCount = data.totalCount || ordersList.length; 
+
+      setTotal(totalCount);       
+      setOrders(ordersList); // Guardamos la lista correcta
+
     } catch (error) {
       console.error(error);
     } finally {

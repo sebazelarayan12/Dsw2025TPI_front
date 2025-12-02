@@ -22,7 +22,7 @@ function RegisterForm({ onSuccess, fixedRole }) {
     setGlobalError('');
     
     // Si viene fixedRole (ej: "Client"), lo usamos. Si no, usamos lo del select.
-    const roleToSend = fixedRole || formData.role || 'Client';
+    const roleToSend = fixedRole || formData.role || 'User';
 
     try {
       const { error } = await registerUser(
@@ -105,21 +105,23 @@ function RegisterForm({ onSuccess, fixedRole }) {
       />
 
       {/* Selector de Rol (Solo si no está fijo) */}
-      {!fixedRole && (
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-gray-700">Rol</label>
-          <select
-            className="border border-gray-300 rounded-lg p-2 text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
-            {...register('role', { required: 'El rol es obligatorio' })}
-          >
-            <option value="Client">Cliente</option>
-            <option value="Admin">Administrador</option>
-          </select>
-          {errors.role && (
-            <p className="text-red-500 text-xs mt-1">{errors.role.message}</p>
-          )}
-        </div>
-      )}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium text-gray-700">Rol</label>
+        <select
+          // Estilos para que parezca deshabilitado (gris y sin cursor)
+          className="border border-gray-300 rounded-lg p-2 text-gray-700 bg-gray-100 cursor-not-allowed outline-none"
+          
+          // Esto lo bloquea para que el usuario no pueda cambiarlo
+          disabled={true}
+          
+          // Esto fuerza que el valor enviado sea siempre "User"
+          {...register('role', { value: 'User' })}
+        >
+          <option value="User">Cliente</option>
+        </select>
+        
+        {/* Ya no hace falta mostrar errores de validación acá porque está fijo */}
+      </div>
 
       {/* Mensaje de Error General */}
       {globalError && (

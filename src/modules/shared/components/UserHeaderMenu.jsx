@@ -12,7 +12,7 @@ export default function UserHeaderMenu({
   onOpenRegister,
   onOpenMobileMenu,
 }) {
-  const { isAuthenticated, user, singout } = useAuth();
+  const { isAuthenticated, user, signout } = useAuth();
   const displayName = user?.name || 'Usuario';
 
   return (
@@ -63,7 +63,7 @@ export default function UserHeaderMenu({
             </>
           ) : (
             <>
-              <Button onClick={singout}>Cerrar sesión</Button>
+              <Button onClick={signout}>Cerrar sesión</Button>
 
               {/* Nombre + Avatar */}
               <div className="flex items-center gap-2 text-sm font-medium">

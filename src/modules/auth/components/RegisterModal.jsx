@@ -5,17 +5,24 @@ import RegisterForm from '../../auth/components/RegisterForm';
 export default function RegisterModal({ isOpen, onClose }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <h2 className="text-2xl font-bold mb-4 text-center">Crear cuenta</h2>
+      {/* Header Fijo */}
+      <h2 className="text-2xl font-bold mb-4 text-center sticky top-0 bg-white z-10 py-2">
+        Crear cuenta
+      </h2>
 
-      <RegisterForm
-        fixedRole="Client"  // ← siempre cliente
-        onSuccess={onClose}
-      />
+      {/* Contenedor con Scroll para el Formulario */}
+      <div className="max-h-[70vh] overflow-y-auto px-1"> {/* <--- ESTA ES LA CLAVE */}
+        <RegisterForm
+          fixedRole="Client"
+          onSuccess={onClose}
+        />
+      </div>
 
-      <p className="text-center text-sm mt-4">
+      {/* Footer Fijo */}
+      <p className="text-center text-sm mt-4 border-t pt-2">
         ¿Ya tienes cuenta?
         <button
-          className="text-blue-600 ml-1"
+          className="text-blue-600 ml-1 hover:underline"
           onClick={() => {
             onClose();
             window.dispatchEvent(new Event('open-login'));

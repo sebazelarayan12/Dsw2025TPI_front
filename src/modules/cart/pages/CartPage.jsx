@@ -21,7 +21,7 @@ import { createOrder } from '../../orders/services/createOrder';
 function CartPage() {
   const navigate = useNavigate();
   const { cart, removeFromCart, clearCart, updateQuantity } = useCart();
-  const { user } = useAuth();
+  const { user, isAuthenticated} = useAuth();
 
   const { deleteQuantities, get, increment, decrement, reset } = useDeleteQuantity();
 
@@ -52,7 +52,7 @@ function CartPage() {
   }, []);
 
   const sendOrder = async () => {
-    if (!user) {
+    if (!isAuthenticated) {
       open('loginModal');
 
       return;
