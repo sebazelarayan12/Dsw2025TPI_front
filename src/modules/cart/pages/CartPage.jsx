@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Hooks
@@ -10,7 +10,6 @@ import { useToggleMap } from '../../shared/hooks/useToggleMap';
 // Components
 import Button from '../../shared/components/Button';
 import Card from '../../shared/components/Card';
-import { ErrorBanner } from '../../shared/components/ErrorBanner';
 import UserHeaderMenu from '../../shared/components/UserHeaderMenu';
 import MobileSideMenu from '../../shared/components/MobileSideMenu';
 import LoginModal from '../../auth/components/LoginModal';
@@ -24,7 +23,6 @@ function CartPage() {
   const { cart, removeFromCart, clearCart, updateQuantity } = useCart();
   const { user, isAuthenticated} = useAuth();
   const isAdmin = user?.role === 'Admin'; // o el valor exacto que uses para admin
-  const [backendError, setBackendError] = useState('');
 
   const { deleteQuantities, get, increment, decrement, reset } = useDeleteQuantity();
 
@@ -57,42 +55,32 @@ function CartPage() {
   const sendOrder = async () => {
     if (!isAuthenticated) {
       open('loginModal');
+
       return;
     }
 
-    // Validaciones frontend
-    if (cart.length === 0) {
-      setBackendError('El carrito está vacío');
-      return;
+    try {
+      const orderData = {
+        customerId: user.customerId,
+        shippingAddress: 'Sin especificar',
+        billingAddress: 'Sin especificar',
+        notes: '',
+        orderItems: cart.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+      };
+
+      const { data, error } = await createOrder(orderData);
+
+      if (error) throw error;
+
+      clearCart();
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      alert('Error al procesar la orden.');
     }
-
-    if (!user.customerId) {
-      setBackendError('No se pudo identificar el cliente');
-      return;
-    }
-
-    setBackendError('');
-
-    const orderData = {
-      customerId: user.customerId,
-      shippingAddress: 'Sin especificar',
-      billingAddress: 'Sin especificar',
-      notes: '',
-      orderItems: cart.map((item) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-      })),
-    };
-
-    const { data, error } = await createOrder(orderData);
-
-    if (error) {
-      setBackendError(error.message || 'Error al procesar la orden');
-      return;
-    }
-
-    clearCart();
-    navigate('/');
   };
 
   const handleCheckout = () => sendOrder();
@@ -227,17 +215,11 @@ function CartPage() {
           <h2 className="text-lg font-semibold">Detalle del pedido</h2>
           <p className="text-lg">Total ítems: {totalItems}</p>
           <p className="text-lg">Total a pagar: ${totalAmount.toFixed(2)}</p>
-          
-          {isAdmin && (
-            <p className="text-sm text-red-600 mt-2">
-              Los administradores no pueden realizar compras
-            </p>
-          )}
-
-          <ErrorBanner 
-            message={backendError} 
-            onClose={() => setBackendError('')}
-          />
+        {isAdmin && (
+    <p className="text-sm text-red-600 mt-2">
+      Los administradores no pueden realizar compras
+    </p>
+  )}
 
           <Button
             className="w-full py-1 text-sm sm:text-base sm:py-2"

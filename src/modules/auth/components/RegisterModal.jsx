@@ -6,7 +6,7 @@ export default function RegisterModal({ isOpen, onClose }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       {/* Header Fijo */}
-      <h2 className="text-2xl font-bold mb-4 text-center sticky top-0 bg-white z-10 py-2">
+      <h2 className="text-2xl font-bold mb-4 text-center sticky top-0 bg-white z-10 py-2 inline-block w-auto mx-auto">
         Crear cuenta
       </h2>
 
