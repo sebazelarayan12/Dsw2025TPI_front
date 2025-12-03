@@ -77,7 +77,7 @@ function ListProductsUserPage() {
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div>
+    <div className="p-4 sm:p-6">
       {/* HEADER REUTILIZABLE */}
       <UserHeaderMenu
         title="Productos"

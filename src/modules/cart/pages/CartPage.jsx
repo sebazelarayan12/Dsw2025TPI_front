@@ -167,7 +167,7 @@ function CartPage() {
                   </p>
                 )}
 
-                <div className="flex justify-between items-center mt-4">
+                <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mt-4">
                   <div className="flex items-center gap-4">
                     <Button
                       onClick={() => decrement(item.sku)}
@@ -189,7 +189,7 @@ function CartPage() {
                   </div>
 
                   <Button
-                    className="ml-50 sm:ml-5 text-sm px-4 py-2 sm:text-base font-semibold"
+                    className="text-sm px-4 py-2 sm:text-base font-semibold"
                     onClick={() => {
                       if (delQty >= item.quantity) removeFromCart(item.sku);
                       else updateQuantity(item.sku, item.quantity - delQty);
