@@ -66,7 +66,7 @@ function AuthProvider({ children }) {
 
     } catch (e) {
       console.error("Error al procesar el token de identidad:", e);
-      return { error: { frontendErrorMessage: "Error de seguridad al procesar credenciales." } };
+      return { error: { message: "Error de seguridad al procesar credenciales." } };
     }
   };
 

@@ -91,7 +91,7 @@ export default function UserHeaderMenu({
                 />
                 {/* Nombre en negrita para que destaque sin fondo */}
                 <span className="hidden lg:block text-sm font-bold text-gray-700">
-                    {user.username || user.name}
+                    {user?.username || user?.name || 'Usuario'}
                 </span>
               </div>
 

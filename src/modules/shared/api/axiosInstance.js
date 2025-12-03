@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { mapBackendError } from '../helpers/mapBackendError';
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
@@ -32,8 +31,6 @@ instance.interceptors.response.use(
         localStorage.removeItem('token');
       }
     }
-
-    error.backendError = mapBackendError(error);
 
     return Promise.reject(error);
   },

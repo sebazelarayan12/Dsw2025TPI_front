@@ -6,8 +6,6 @@ import Button from '../../shared/components/Button';
 import useAuth from '../hooks/useAuth';
 
 function LoginForm({ onSuccess }) {
-  // Simplificamos el estado de error a un solo string, 
-  // ya que el helper mapBackendError nos da el mensaje procesado.
   const [globalError, setGlobalError] = useState('');
 
   const {
@@ -24,11 +22,9 @@ function LoginForm({ onSuccess }) {
     setGlobalError('');
     
     try {
-      //mapBackendError, 'error' ya trae { message: "..." }
       const { error } = await signin(formData.username, formData.password);
 
       if (error) {
-        // 2. CORRECCIÓN: Leemos directamente el mensaje procesado
         setGlobalError(error.message || 'Ocurrió un error inesperado');
         return;
       }

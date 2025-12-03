@@ -3,14 +3,11 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Input from '../../shared/components/Input';
 import Button from '../../shared/components/Button';
+import { ErrorBanner } from '../../shared/components/ErrorBanner';
 import useAuth from '../hooks/useAuth';
-// Ya no necesitamos SweetAlert aquí
 
 function RegisterForm({ onSuccess, fixedRole }) {
-  const [errorMessage, setErrorMessage] = useState('');
-  const [errorMessages, setErrorMessages] = useState([]);
-  
-  // 1. NUEVO: Estado para el mensaje de éxito
+  const [backendError, setBackendError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
   const {
@@ -24,60 +21,27 @@ function RegisterForm({ onSuccess, fixedRole }) {
   const { register: registerUser } = useAuth();
 
   const onValid = async ({ username, password, email, name }) => {
-    setErrorMessage('');
-    setErrorMessages([]);
-    setSuccessMessage(''); // Limpiamos mensajes previos
+    setBackendError('');
+    setSuccessMessage('');
     
     const finalRole = 'User';
 
-    try {
-      const { error } = await registerUser(username, password, email, finalRole, name);
+    const { data, error } = await registerUser(username, password, email, finalRole, name);
 
-      if (error) {
-        const detailedMessages = (error.errors || [])
-          .map((err) => frontendErrorMessage[err.code] || err.message)
-          .filter(Boolean);
-
-        setErrorMessages(detailedMessages);
-        setErrorMessage(
-          error.frontendErrorMessage
-          || detailedMessages[0]
-          || error.backendMessage
-          || 'No se pudo completar el registro',
-        );
-        return;
-      }
-
-      // --- CAMBIO IMPORTANTE AQUÍ ---
-      // 2. Mostramos mensaje de éxito y esperamos 2 segundos antes de cerrar
-      setSuccessMessage('¡Usuario registrado con éxito!');
-
-      setTimeout(() => {
-        if (onSuccess) {
-            onSuccess(); // Cierra el modal (pop-up)
-        } else {
-            navigate('/login'); // O cambia de página
-        }
-      }, 2000); // 2000 milisegundos = 2 segundos de espera
-
-    } catch (err) {
-      const backendError = err.backendError;
-      if (backendError) {
-        const detailedMessages = (backendError.errors || [])
-          .map((e) => frontendErrorMessage[e.code] || e.message)
-          .filter(Boolean);
-
-        setErrorMessages(detailedMessages);
-        setErrorMessage(
-          backendError.frontendErrorMessage
-          || detailedMessages[0]
-          || backendError.backendMessage
-          || 'Llame a soporte',
-        );
-        return;
-      }
-      setErrorMessage('Llame a soporte');
+    if (error) {
+      setBackendError(error.message || 'No se pudo completar el registro');
+      return;
     }
+
+    setSuccessMessage('¡Usuario registrado con éxito!');
+
+    setTimeout(() => {
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        navigate('/login');
+      }
+    }, 2000);
   };
 
   return (
@@ -97,26 +61,41 @@ function RegisterForm({ onSuccess, fixedRole }) {
       autoComplete='off'
       onSubmit={handleSubmit(onValid)}
     >
-      <h2 className="text-xl sm:text-2xl font-bold text-center text-gray-800 mb-2 sm:mb-4">
-        Crear Cuenta
-      </h2>
+      {!onSuccess && (
+        <h2 className="text-xl sm:text-2xl font-bold text-center text-gray-800 mb-2 sm:mb-4">
+          Crear Cuenta
+        </h2>
+      )}
 
       <Input
         label="Usuario"
-        {...register('username', { required: 'Usuario es obligatorio' })}
+        {...register('username', { 
+          required: 'El usuario es obligatorio',
+          minLength: { value: 3, message: 'El usuario debe tener al menos 3 caracteres' }
+        })}
         error={errors.username?.message}
       />
 
       <Input
         label="Email"
-        {...register('email', { required: 'Email es obligatorio' })}
+        type="email"
+        {...register('email', { 
+          required: 'El email es obligatorio',
+          pattern: {
+            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+            message: 'Email inválido'
+          }
+        })}
         error={errors.email?.message}
       />
 
       <Input
         label="Contraseña"
         type="password"
-        {...register('password', { required: 'Contraseña obligatoria' })}
+        {...register('password', { 
+          required: 'La contraseña es obligatoria',
+          minLength: { value: 8, message: 'La contraseña debe tener al menos 8 caracteres' }
+        })}
         error={errors.password?.message}
       />
 
@@ -124,7 +103,7 @@ function RegisterForm({ onSuccess, fixedRole }) {
         label="Confirmar Contraseña"
         type="password"
         {...register('confirmPassword', {
-          required: 'Confirmación obligatoria',
+          required: 'La confirmación es obligatoria',
           validate: (v) => v === getValues('password') || 'Las contraseñas no coinciden',
         })}
         error={errors.confirmPassword?.message}
@@ -132,7 +111,10 @@ function RegisterForm({ onSuccess, fixedRole }) {
 
       <Input
         label="Nombre"
-        {...register('name', { required: 'El nombre es obligatorio' })}
+        {...register('name', { 
+          required: 'El nombre es obligatorio',
+          minLength: { value: 2, message: 'El nombre debe tener al menos 2 caracteres' }
+        })}
         error={errors.name?.message}
       />
 
@@ -147,23 +129,18 @@ function RegisterForm({ onSuccess, fixedRole }) {
         </select>
       </div>
 
-      {/* 3. AQUÍ SE MUESTRA EL MENSAJE DE ÉXITO EN VERDE */}
+      {/* Mensaje de éxito */}
       {successMessage && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative text-center">
-            <strong className="font-bold">{successMessage}</strong>
+          <strong className="font-bold">✓ {successMessage}</strong>
         </div>
       )}
 
-      {errorMessage && (
-        <p className="text-red-500 text-center text-sm">{errorMessage}</p>
-      )}
-      {errorMessages.length > 0 && (
-        <ul className="text-red-500 text-sm list-disc list-inside space-y-1">
-          {errorMessages.map((msg, idx) => (
-            <li key={idx}>{msg}</li>
-          ))}
-        </ul>
-      )}
+      {/* Banner de error del backend */}
+      <ErrorBanner 
+        message={backendError} 
+        onClose={() => setBackendError('')}
+      />
 
       {/* Botón principal */}
       <Button type="submit">Registrarse</Button>
