@@ -17,7 +17,7 @@ function Dashboard() {
 
   const getLinkStyles = ({ isActive }) => (
     `
-      pl-4 w-full block  pt-4 pb-4 rounded-4xl transition hover:bg-gray-100
+      pl-4 w-full block pt-2 pb-2 sm:pt-4 sm:pb-4 text-sm sm:text-base rounded-4xl transition hover:bg-gray-100
       ${isActive
       ? 'bg-purple-200 hover:bg-purple-100 '
       : ''
@@ -26,7 +26,7 @@ function Dashboard() {
   );
 
   const renderLogoutButton = (mobile = false) => (
-    <Button className={`${mobile ? 'block w-full sm:hidden' :  'hidden sm:block' }`} onClick={logout}>Cerrar sesión</Button>
+    <Button className={`text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-2 ${mobile ? 'block w-full sm:hidden' :  'hidden sm:block' }`} onClick={logout}>Cerrar sesión</Button>
   );
 
   return (
@@ -74,7 +74,8 @@ function Dashboard() {
           bottom-0
           bg-white
           w-64
-          p-6
+          p-4
+          sm:p-6
           ${openMenu ? 'left-0' : 'left-[-256px]'}
           rounded
           shadow

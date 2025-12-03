@@ -6,6 +6,8 @@ import MobileSideMenu from "../../shared/components/MobileSideMenu";
 import UserHeaderMenu from "../../shared/components/UserHeaderMenu";
 import LoginModal from "../../auth/components/LoginModal";
 import RegisterModal from "../../auth/components/RegisterModal";
+import Pagination from "../../shared/components/Pagination";
+import { usePagination } from "../../shared/hooks/usePagination";
 import { getClientProducts } from "../services/listUser";
 import { useCart } from "../../cart/hooks/useCart";
 
@@ -18,10 +20,8 @@ function ListProductsUserPage() {
   // PRODUCT STATE
   const [searchTerm, setSearchTerm] = useState("");
   const [status] = useState("enabled");
-  const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const pagination = usePagination(10);
 
-  const [total, setTotal] = useState(0);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -58,12 +58,12 @@ function ListProductsUserPage() {
       const { data, error } = await getClientProducts(
         searchTerm,
         status,
-        pageNumber,
-        pageSize
+        pagination.pageNumber,
+        pagination.pageSize
       );
       if (error) throw error;
 
-      setTotal(data.total);
+      pagination.setTotal(data.total);
       setProducts(data.productItems || []);
     } finally {
       setLoading(false);
@@ -72,9 +72,7 @@ function ListProductsUserPage() {
 
   useEffect(() => {
     fetchProducts();
-  }, [pageNumber, pageSize]);
-
-  const totalPages = Math.ceil(total / pageSize);
+  }, [pagination.pageNumber, pagination.pageSize]);
 
   return (
     <div className="p-4 sm:p-6">
@@ -222,41 +220,14 @@ function ListProductsUserPage() {
       </div>
 
       {/* PAGINATION */}
-      <div className="flex justify-center items-center mt-3">
-        <button
-          disabled={pageNumber === 1}
-          onClick={() => setPageNumber(pageNumber - 1)}
-          className="bg-gray-200 disabled:bg-gray-100 text-sm px-4 py-2 sm:text-base"
-        >
-          Atras
-        </button>
-
-        <span className="w-8 text-base sm:w-8 sm:text-lg font-semibold">
-          {pageNumber} / {totalPages}
-        </span>
-
-        <button
-          disabled={pageNumber === totalPages}
-          onClick={() => setPageNumber(pageNumber + 1)}
-          className="bg-gray-200 disabled:bg-gray-100 text-sm px-4 py-2 sm:text-base"
-        >
-          Siguiente
-        </button>
-
-        <select
-          value={pageSize}
-          onChange={(evt) => {
-            setPageNumber(1);
-            setPageSize(Number(evt.target.value));
-          }}
-          className="ml-3 w-20 text-base sm:w-8 sm:text-lg font-semibold"
-        >
-          <option value="2">2</option>
-          <option value="10">10</option>
-          <option value="15">15</option>
-          <option value="20">20</option>
-        </select>
-      </div>
+      <Pagination
+        currentPage={pagination.pageNumber}
+        totalPages={pagination.totalPages}
+        pageSize={pagination.pageSize}
+        onPrevPage={pagination.prevPage}
+        onNextPage={pagination.nextPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
 
       {/* MODALS */}
       <LoginModal

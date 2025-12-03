@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../shared/components/Button';
 import Card from '../../shared/components/Card';
+import Pagination from '../../shared/components/Pagination';
+import { usePagination } from '../../shared/hooks/usePagination';
 import { getOrders } from '../services/listServices'; // nuevo servicio
 
 const orderStatus = {
@@ -19,20 +21,18 @@ function ListOrdersPage() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [status, setStatus] = useState(orderStatus.ALL);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const pagination = usePagination(10);
 
-  const [total, setTotal] = useState(0);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const { data, error } = await getOrders(searchTerm, status, pageNumber, pageSize);
+      const { data, error } = await getOrders(searchTerm, status, pagination.pageNumber, pagination.pageSize);
       if (error) throw error;
 
-      setTotal(data.totalCount);      
+      pagination.setTotal(data.totalCount);      
     setOrders(data.items ?? []);
     } catch (error) {
       console.error(error);
@@ -43,15 +43,13 @@ function ListOrdersPage() {
 
   useEffect(() => {
     fetchOrders();
-  }, [status, pageSize, pageNumber]);
-
-  const totalPages = Math.ceil(total / pageSize);
+  }, [status, pagination.pageSize, pagination.pageNumber]);
 
   return (
     <div>
       <Card>
         <div className="flex justify-between items-center mb-3">
-          <h1 className="text-3xl">Órdenes</h1>
+          <h1 className="text-xl sm:text-3xl">Órdenes</h1>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
@@ -61,7 +59,7 @@ function ListOrdersPage() {
               onChange={(evt) => setSearchTerm(evt.target.value)}
               type="text"
               placeholder="Buscar"
-              className="text-[1.3rem] w-full"
+              className="text-base sm:text-[1.3rem] w-full"
             />
            <Button onClick={fetchOrders} className="h-11 w-11 flex items-center justify-center p-0">
              <svg 
@@ -86,7 +84,7 @@ function ListOrdersPage() {
 
           </div>
 
-          <select onChange={(evt) => setStatus(evt.target.value)} className="text-[1.3rem]">
+          <select onChange={(evt) => setStatus(evt.target.value)} className="text-base sm:text-[1.3rem]">
             <option value={orderStatus.ALL}>Todos</option>
             <option value={orderStatus.PENDING}>Pendientes</option>
             <option value={orderStatus.PROCESSING}>Procesadas</option>
@@ -129,37 +127,14 @@ function ListOrdersPage() {
         )}
       </div>
 
-      <div className="flex justify-center items-center mt-3 gap-2 sm:gap-4 text-sm sm:text-base">
-        <button 
-          disabled={pageNumber === 1} 
-          onClick={() => setPageNumber(pageNumber - 1)}
-          className="px-2 sm:px-3 py-1 disabled:opacity-50"
-        >
-          Atrás
-        </button>
-        <span className="px-2">{pageNumber} / {totalPages}</span>
-        <button 
-          disabled={pageNumber === totalPages} 
-          onClick={() => setPageNumber(pageNumber + 1)}
-          className="px-2 sm:px-3 py-1 disabled:opacity-50"
-        >
-          Siguiente
-        </button>
-
-        <select
-          value={pageSize}
-          onChange={(evt) => {
-            setPageNumber(1);
-            setPageSize(Number(evt.target.value));
-          }}
-          className="text-sm sm:text-base px-2 py-1"
-        >
-          <option value="2">2</option>
-          <option value="10">10</option>
-          <option value="15">15</option>
-          <option value="20">20</option>
-        </select>
-      </div>
+      <Pagination
+        currentPage={pagination.pageNumber}
+        totalPages={pagination.totalPages}
+        pageSize={pagination.pageSize}
+        onPrevPage={pagination.prevPage}
+        onNextPage={pagination.nextPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
     </div>
   );
 }
