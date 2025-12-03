@@ -6,146 +6,159 @@ import Button from '../../shared/components/Button';
 import useAuth from '../hooks/useAuth';
 
 function RegisterForm({ onSuccess, fixedRole }) {
-  const [globalError, setGlobalError] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessages, setErrorMessages] = useState([]);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     getValues,
   } = useForm();
 
   const navigate = useNavigate();
   const { register: registerUser } = useAuth();
 
-  const onValid = async (formData) => {
-    setGlobalError('');
-    
-    // Si viene fixedRole (ej: "Client"), lo usamos. Si no, usamos lo del select.
-    const roleToSend = fixedRole || formData.role || 'User';
+  const onValid = async ({ username, password, email, role, name }) => {
+    setErrorMessage('');
+    setErrorMessages([]);
+    const finalRole = fixedRole ?? role;
 
     try {
-      const { error } = await registerUser(
-        formData.username, 
-        formData.password, 
-        formData.email, 
-        roleToSend
-      );
+      const { error } = await registerUser(username, password, email, finalRole, name);
 
       if (error) {
-        // Leemos el mensaje simplificado del helper mapBackendError
-        setGlobalError(error.message || 'No se pudo completar el registro');
+        const detailedMessages = (error.errors || [])
+          .map((err) => frontendErrorMessage[err.code] || err.message)
+          .filter(Boolean);
+
+        setErrorMessages(detailedMessages);
+        setErrorMessage(
+          error.frontendErrorMessage
+          || detailedMessages[0]
+          || error.backendMessage
+          || 'No se pudo completar el registro',
+        );
+
         return;
       }
 
-      // Éxito
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        navigate('/login'); // O donde prefieras ir post-registro
-      }
+      if (onSuccess) return onSuccess();
+
+      navigate('/login');
 
     } catch (err) {
-      console.error(err);
-      setGlobalError('Error inesperado al intentar registrarse.');
+      const backendError = err.backendError;
+
+      if (backendError) {
+        const detailedMessages = (backendError.errors || [])
+          .map((e) => frontendErrorMessage[e.code] || e.message)
+          .filter(Boolean);
+
+        setErrorMessages(detailedMessages);
+        setErrorMessage(
+          backendError.frontendErrorMessage
+          || detailedMessages[0]
+          || backendError.backendMessage
+          || 'Llame a soporte',
+        );
+
+        return;
+      }
+
+      setErrorMessage('Llame a soporte');
     }
   };
 
   return (
     <form
-      className="flex flex-col gap-6 bg-white p-8 rounded-xl shadow-lg w-full max-w-md mx-auto"
+      className="
+        flex flex-col gap-8
+        bg-white
+        p-8
+        rounded-xl
+        shadow-lg
+        w-full
+        max-w-md
+        mx-auto
+      "
       onSubmit={handleSubmit(onValid)}
     >
-      <h2 className="text-2xl font-bold text-center text-gray-800">Crear Cuenta</h2>
 
-      {/* Usuario */}
       <Input
         label="Usuario"
-        {...register('username', { required: 'El usuario es obligatorio' })}
+        {...register('username', { required: 'Usuario es obligatorio' })}
         error={errors.username?.message}
       />
 
-      {/* Email */}
       <Input
         label="Email"
-        type="email"
-        {...register('email', { 
-          required: 'El email es obligatorio',
-          pattern: {
-            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-            message: 'Formato de email inválido'
-          }
-        })}
+        {...register('email', { required: 'Email es obligatorio' })}
         error={errors.email?.message}
       />
 
-      {/* Contraseña */}
       <Input
         label="Contraseña"
         type="password"
-        {...register('password', { 
-          required: 'La contraseña es obligatoria',
-          minLength: { value: 6, message: 'Mínimo 6 caracteres' }
-        })}
+        {...register('password', { required: 'Contraseña obligatoria' })}
         error={errors.password?.message}
       />
 
-      {/* Confirmar Contraseña */}
       <Input
         label="Confirmar Contraseña"
         type="password"
         {...register('confirmPassword', {
-          required: 'Confirma tu contraseña',
-          validate: (val) => {
-            if (!val) return true;
-            return val === getValues('password') || 'Las contraseñas no coinciden';
-          }
+          required: 'Confirmación obligatoria',
+          validate: (v) => v === getValues('password') || 'Las contraseñas no coinciden',
         })}
         error={errors.confirmPassword?.message}
       />
 
-      {/* Selector de Rol (Solo si no está fijo) */}
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-gray-700">Rol</label>
-        <select
-          // Estilos para que parezca deshabilitado (gris y sin cursor)
-          className="border border-gray-300 rounded-lg p-2 text-gray-700 bg-gray-100 cursor-not-allowed outline-none"
-          
-          // Esto lo bloquea para que el usuario no pueda cambiarlo
-          disabled={true}
-          
-          // Esto fuerza que el valor enviado sea siempre "User"
-          {...register('role', { value: 'User' })}
-        >
-          <option value="User">Cliente</option>
-        </select>
-        
-        {/* Ya no hace falta mostrar errores de validación acá porque está fijo */}
-      </div>
+      <Input
+        label="Nombre"
+        {...register('name', { required: 'El nombre es obligatorio' })}
+        error={errors.name?.message}
+      />
 
-      {/* Mensaje de Error General */}
-      {globalError && (
-        <div className="p-3 text-sm text-red-600 bg-red-50 rounded border border-red-200 text-center">
-          {globalError}
+      {!fixedRole && (
+        <div className="flex flex-col gap-1">
+          <label className="text-md font-medium text-gray-600">Rol</label>
+
+          <select
+            className="border rounded-lg p-2 text-gray-700"
+            {...register('role', { required: 'El rol es obligatorio' })}
+          >
+            <option value="Client">Cliente</option>
+            <option value="Admin">Admin</option>
+          </select>
+
+          {errors.role?.message && (
+            <p className="text-red-500 text-sm">{errors.role.message}</p>
+          )}
         </div>
       )}
 
-      {/* Botones */}
-      <div className="flex flex-col gap-3 mt-2">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Registrando...' : 'Registrarse'}
-        </Button>
+      {errorMessage && (
+        <p className="text-red-500 text-center text-sm">{errorMessage}</p>
+      )}
+      {errorMessages.length > 0 && (
+        <ul className="text-red-500 text-sm list-disc list-inside space-y-1">
+          {errorMessages.map((msg, idx) => (
+            <li key={idx}>{msg}</li>
+          ))}
+        </ul>
+      )}
 
-        {!onSuccess && (
-          <Button 
-            type="button" 
-            onClick={() => navigate('/login')}
-            className="bg-gray-100 text-gray-700 hover:bg-gray-200 mt-2"
-          >
-            ¿Ya tienes cuenta? Iniciar Sesión
-          </Button>
-        )}
-      </div>
+      {/* Botón principal */}
+      <Button type="submit">Registrarse</Button>
+
+      {/*botón para volver al login */}
+      {!onSuccess && (
+        <Button type="button" onClick={() => navigate('/login')}>
+          Iniciar Sesión
+        </Button>
+      )}
+
     </form>
   );
 }

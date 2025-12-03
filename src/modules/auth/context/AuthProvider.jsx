@@ -79,8 +79,8 @@ function AuthProvider({ children }) {
   };
 
   // 5. Función de Registro
-  const register = async (username, password, email, role) => {
-    const { error } = await registerService(username, password, email, role);
+  const register = async (username, password, email, role, name) => {
+    const { error } = await registerService(username, password, email, role, name);
     return { error: error || null };
   };
 
