@@ -3,12 +3,14 @@ import RegisterForm from '../components/RegisterForm';
 function RegisterPage() {
   return (
     <div className='
-    flex
+      flex
       flex-col
-      justify-center
-      h-[100dvh]
+      justify-start
+      items-center
+      min-h-[100dvh]
       bg-neutral-100
-      sm:items-center
+      overflow-y-auto
+      py-4
     '>
       <RegisterForm />
     </div>

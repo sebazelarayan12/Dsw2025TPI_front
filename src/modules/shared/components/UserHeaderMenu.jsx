@@ -13,7 +13,7 @@ export default function UserHeaderMenu({
   onOpenMobileMenu,
 }) {
   const { isAuthenticated, user, signout } = useAuth();
-  const displayName = user?.name || 'Usuario';
+  const displayName = user?.name;
 
   return (
     <div className="mb-3">
@@ -72,7 +72,7 @@ export default function UserHeaderMenu({
                   alt='avatar'
                   className="w-8 h-8 rounded-full"
                 />
-                <span>{displayName}</span>
+                <span>{user.username}</span>
               </div>
             </>
           )}

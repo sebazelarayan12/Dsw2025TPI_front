@@ -13,7 +13,7 @@ export default function RegisterModal({ isOpen, onClose }) {
       {/* Contenedor con Scroll para el Formulario */}
       <div className="max-h-[70vh] overflow-y-auto px-1"> {/* <--- ESTA ES LA CLAVE */}
         <RegisterForm
-          fixedRole="Client"
+          fixedRole="User"
           onSuccess={onClose}
         />
       </div>

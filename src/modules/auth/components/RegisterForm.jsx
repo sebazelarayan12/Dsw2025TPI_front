@@ -19,10 +19,10 @@ function RegisterForm({ onSuccess, fixedRole }) {
   const navigate = useNavigate();
   const { register: registerUser } = useAuth();
 
-  const onValid = async ({ username, password, email, role, name }) => {
+  const onValid = async ({ username, password, email, name }) => {
     setErrorMessage('');
     setErrorMessages([]);
-    const finalRole = fixedRole ?? role;
+    const finalRole = 'User'; // Rol fijo - debe coincidir con el backend
 
     try {
       const { error } = await registerUser(username, password, email, finalRole, name);
@@ -73,17 +73,23 @@ function RegisterForm({ onSuccess, fixedRole }) {
   return (
     <form
       className="
-        flex flex-col gap-8
+        flex flex-col gap-2 sm:gap-4
         bg-white
-        p-8
+        p-4 sm:p-6
+        pt-6 sm:pt-8
         rounded-xl
         shadow-lg
         w-full
-        max-w-md
+        max-w-sm
         mx-auto
+        my-4 sm:my-8
       "
+      autoComplete='off'
       onSubmit={handleSubmit(onValid)}
     >
+      <h2 className="text-xl sm:text-2xl font-bold text-center text-gray-800 mb-2 sm:mb-4">
+        Crear Cuenta
+      </h2>
 
       <Input
         label="Usuario"
@@ -120,23 +126,17 @@ function RegisterForm({ onSuccess, fixedRole }) {
         error={errors.name?.message}
       />
 
-      {!fixedRole && (
-        <div className="flex flex-col gap-1">
-          <label className="text-md font-medium text-gray-600">Rol</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-sm sm:text-base font-medium text-gray-600">Rol</label>
 
-          <select
-            className="border rounded-lg p-2 text-gray-700"
-            {...register('role', { required: 'El rol es obligatorio' })}
-          >
-            <option value="Client">Cliente</option>
-            <option value="Admin">Admin</option>
-          </select>
-
-          {errors.role?.message && (
-            <p className="text-red-500 text-sm">{errors.role.message}</p>
-          )}
-        </div>
-      )}
+        <select
+          className="border rounded-lg p-2 sm:p-3 text-base sm:text-lg text-gray-700 bg-gray-100 cursor-not-allowed"
+          disabled
+          value="Usuario"
+        >
+          <option value="Usuario">Usuario</option>
+        </select>
+      </div>
 
       {errorMessage && (
         <p className="text-red-500 text-center text-sm">{errorMessage}</p>

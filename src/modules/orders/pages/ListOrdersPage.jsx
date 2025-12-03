@@ -106,8 +106,16 @@ function ListOrdersPage() {
            <Card key={order.id}>
             <div className="flex justify-between items-center w-full">
               <div>
-                <h1>#{order.id} | {order.customerId}</h1>
-                <p>Estado: {order.status}</p>
+                <h1 className="text-lg sm:text-xl font-bold">
+                  #{order.id}
+                  {order.customerName && (
+                    <span className="text-gray-600 font-normal ml-2">
+                      | {order.customerName}
+                    </span>
+                  )}
+                </h1>
+                <p className="text-sm sm:text-base text-gray-700 mt-1">Estado: <span className="font-semibold">{order.status}</span></p>
+                <p className="text-sm sm:text-base text-gray-700 mt-1">Total: <span className="font-semibold">${order.totatAmount?.toFixed(2)}</span></p>
               </div>
 
               <Button 
@@ -121,12 +129,20 @@ function ListOrdersPage() {
         )}
       </div>
 
-      <div className="flex justify-center items-center mt-3">
-        <button disabled={pageNumber === 1} onClick={() => setPageNumber(pageNumber - 1)}>
+      <div className="flex justify-center items-center mt-3 gap-2 sm:gap-4 text-sm sm:text-base">
+        <button 
+          disabled={pageNumber === 1} 
+          onClick={() => setPageNumber(pageNumber - 1)}
+          className="px-2 sm:px-3 py-1 disabled:opacity-50"
+        >
           Atrás
         </button>
-        <span>{pageNumber} / {totalPages}</span>
-        <button disabled={pageNumber === totalPages} onClick={() => setPageNumber(pageNumber + 1)}>
+        <span className="px-2">{pageNumber} / {totalPages}</span>
+        <button 
+          disabled={pageNumber === totalPages} 
+          onClick={() => setPageNumber(pageNumber + 1)}
+          className="px-2 sm:px-3 py-1 disabled:opacity-50"
+        >
           Siguiente
         </button>
 
@@ -136,6 +152,7 @@ function ListOrdersPage() {
             setPageNumber(1);
             setPageSize(Number(evt.target.value));
           }}
+          className="text-sm sm:text-base px-2 py-1"
         >
           <option value="2">2</option>
           <option value="10">10</option>

@@ -18,15 +18,13 @@ function LoginForm({ onSuccess }) {
 
   const navigate = useNavigate();
   
-  // 1. CORRECCIÓN: Usamos 'signIn' (como se llama en AuthProvider)
   const { signin } = useAuth();
 
   const onValid = async (formData) => {
-    setGlobalError(''); // Limpiar errores previos
+    setGlobalError('');
     
     try {
-      // Llamamos al signIn
-      // Gracias a tu nuevo login.js y mapBackendError, 'error' ya trae { message: "..." }
+      //mapBackendError, 'error' ya trae { message: "..." }
       const { error } = await signin(formData.username, formData.password);
 
       if (error) {
@@ -98,7 +96,7 @@ function LoginForm({ onSuccess }) {
         {!onSuccess && (
           <Button
             type="button"
-            onClick={() => navigate('/signup')} // Asegurate que esta ruta exista en App.jsx
+            onClick={() => navigate('/register')} // Asegurate que esta ruta exista en App.jsx
             className="bg-gray-100 text-gray-700 hover:bg-gray-200 mt-2"
           >
             Registrarse

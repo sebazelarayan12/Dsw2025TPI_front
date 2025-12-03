@@ -157,10 +157,10 @@ function ListProductsUserPage() {
                   })()}
 
 
-                <div className="flex items-center gap-4 mt-3">
-                  <Button
-                   
-                    onClick={() =>
+                <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 mt-3">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() =>
                         setQuantities((prev) => ({
                           ...prev,
                           [product.sku]: Math.max(1, qty - 1),
@@ -169,14 +169,13 @@ function ListProductsUserPage() {
                       disabled={qty <= 1}
                       className="px-2 py-1 text-sm sm:px-3 sm:py-2 sm:text-base disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                    ➖
-                  </Button>
+                      ➖
+                    </Button>
 
-                  <span className="w-8 text-center text-lg font-semibold">
-                    {qty}
-                  </span>
+                    <span className="w-8 text-center text-base sm:text-lg font-semibold">
+                      {qty}
+                    </span>
 
-                  <div className="flex items-center gap-2">
                     <Button
                       onClick={() =>
                         setQuantities((prev) => ({
@@ -192,30 +191,29 @@ function ListProductsUserPage() {
                     >
                       ➕
                     </Button>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+                    <Button
+                      onClick={() => {
+                        addToCart(product, qty);
+                        setQuantities((prev) => ({
+                          ...prev,
+                          [product.sku]: 1,
+                        }));
+                      }}
+                      disabled={isMaxReached}
+                      className="w-full sm:w-auto text-sm px-4 py-2 sm:text-base disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Agregar
+                    </Button>
 
                     {isMaxReached && (
-                      <span className="text-sm text-red-600 font-medium">
+                      <span className="text-xs sm:text-sm text-red-600 font-medium">
                         No hay stock
                       </span>
                     )}
                   </div>
-
-
-                 <Button
-                  onClick={() => {
-                    addToCart(product, qty);
-                    setQuantities((prev) => ({
-                      ...prev,
-                      [product.sku]: 1,
-                    }));
-                  }}
-                  disabled={isMaxReached}
-                  className="ml-50 sm:ml-5 text-sm px-4 py-2 sm:text-base disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Agregar
-                </Button>
-
-
                 </div>
               </Card>
             );
