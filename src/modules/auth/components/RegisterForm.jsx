@@ -4,10 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../../shared/components/Input';
 import Button from '../../shared/components/Button';
 import useAuth from '../hooks/useAuth';
+// Ya no necesitamos SweetAlert aquí
 
 function RegisterForm({ onSuccess, fixedRole }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
+  
+  // 1. NUEVO: Estado para el mensaje de éxito
+  const [successMessage, setSuccessMessage] = useState('');
 
   const {
     register,
@@ -22,7 +26,9 @@ function RegisterForm({ onSuccess, fixedRole }) {
   const onValid = async ({ username, password, email, name }) => {
     setErrorMessage('');
     setErrorMessages([]);
-    const finalRole = 'User'; // Rol fijo - debe coincidir con el backend
+    setSuccessMessage(''); // Limpiamos mensajes previos
+    
+    const finalRole = 'User';
 
     try {
       const { error } = await registerUser(username, password, email, finalRole, name);
@@ -39,17 +45,23 @@ function RegisterForm({ onSuccess, fixedRole }) {
           || error.backendMessage
           || 'No se pudo completar el registro',
         );
-
         return;
       }
 
-      if (onSuccess) return onSuccess();
+      // --- CAMBIO IMPORTANTE AQUÍ ---
+      // 2. Mostramos mensaje de éxito y esperamos 2 segundos antes de cerrar
+      setSuccessMessage('¡Usuario registrado con éxito!');
 
-      navigate('/login');
+      setTimeout(() => {
+        if (onSuccess) {
+            onSuccess(); // Cierra el modal (pop-up)
+        } else {
+            navigate('/login'); // O cambia de página
+        }
+      }, 2000); // 2000 milisegundos = 2 segundos de espera
 
     } catch (err) {
       const backendError = err.backendError;
-
       if (backendError) {
         const detailedMessages = (backendError.errors || [])
           .map((e) => frontendErrorMessage[e.code] || e.message)
@@ -62,10 +74,8 @@ function RegisterForm({ onSuccess, fixedRole }) {
           || backendError.backendMessage
           || 'Llame a soporte',
         );
-
         return;
       }
-
       setErrorMessage('Llame a soporte');
     }
   };
@@ -128,7 +138,6 @@ function RegisterForm({ onSuccess, fixedRole }) {
 
       <div className="flex flex-col gap-1">
         <label className="text-sm sm:text-base font-medium text-gray-600">Rol</label>
-
         <select
           className="border rounded-lg p-2 sm:p-3 text-base sm:text-lg text-gray-700 bg-gray-100 cursor-not-allowed"
           disabled
@@ -137,6 +146,13 @@ function RegisterForm({ onSuccess, fixedRole }) {
           <option value="Usuario">Usuario</option>
         </select>
       </div>
+
+      {/* 3. AQUÍ SE MUESTRA EL MENSAJE DE ÉXITO EN VERDE */}
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative text-center">
+            <strong className="font-bold">{successMessage}</strong>
+        </div>
+      )}
 
       {errorMessage && (
         <p className="text-red-500 text-center text-sm">{errorMessage}</p>
@@ -152,7 +168,7 @@ function RegisterForm({ onSuccess, fixedRole }) {
       {/* Botón principal */}
       <Button type="submit">Registrarse</Button>
 
-      {/*botón para volver al login */}
+      {/* Botón volver */}
       {!onSuccess && (
         <Button type="button" onClick={() => navigate('/login')}>
           Iniciar Sesión

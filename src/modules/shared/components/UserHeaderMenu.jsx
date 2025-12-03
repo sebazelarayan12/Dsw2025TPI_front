@@ -13,28 +13,26 @@ export default function UserHeaderMenu({
   onOpenMobileMenu,
 }) {
   const { isAuthenticated, user, signout } = useAuth();
-  const displayName = user?.name;
-
+  
   return (
     <div className="mb-3">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center py-2">
 
-        {/* TÍTULO */}
-        <h1 className="text-3xl">{title}</h1>
-
-        {/* SEARCH DESKTOP */}
-        <div className="hidden sm:flex flex-1 px-6">
-          {search && (
-            <SearchBar
-              value={search.value}
-              onChange={search.onChange}
-              onSearch={search.onSearch}
-            />
-          )}
+        {/* --- LOGO --- */}
+        <div className="flex items-center gap-3 pr-4">
+            <div className="bg-fuchsia-600 p-2 rounded-xl shadow-lg transform -rotate-3 hover:rotate-0 transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+            </div>
+            
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 tracking-tight">
+                {title}
+            </h1>
         </div>
 
-        {/* SEARCH MOBILE */}
-        <div className="sm:hidden w-full">
+        {/* SEARCH DESKTOP */}
+        <div className="hidden sm:flex flex-1 px-6 max-w-lg">
           {search && (
             <SearchBar
               value={search.value}
@@ -47,12 +45,31 @@ export default function UserHeaderMenu({
         {/* BOTONES DESKTOP */}
         <div className="hidden sm:flex items-center gap-3">
           {onGoProducts && (
-            <Button onClick={onGoProducts}>Volver</Button>
+            <Button onClick={onGoProducts} className="bg-gray-100 text-gray-700 hover:bg-gray-200">
+                Volver
+            </Button>
           )}
 
           {onGoCart && (
-            <Button onClick={onGoCart}>
-              Carrito ({totalItems})
+            <Button onClick={onGoCart} className="relative overflow-visible">
+              Carrito
+              {/* Badge del Carrito */}
+              {totalItems > 0 && (
+                <span className="
+                    absolute -top-1.5 -right-1.5
+                    bg-fuchsia-600 text-white 
+                    text-[10px] font-bold
+                    px-1.5
+                    h-4 min-w-[1rem]
+                    rounded-full 
+                    border border-white
+                    flex items-center justify-center
+                    whitespace-nowrap
+                    z-50
+                ">
+                    {totalItems}
+                </span>
+              )}
             </Button>
           )}
 
@@ -62,31 +79,53 @@ export default function UserHeaderMenu({
               <Button onClick={onOpenRegister}>Registrarse</Button>
             </>
           ) : (
-            <>
-              <Button onClick={signout}>Cerrar sesión</Button>
-
-              {/* Nombre + Avatar */}
-              <div className="flex items-center gap-2 text-sm font-medium">
+            // --- USUARIO LOGUEADO (LIMPIO) ---
+            <div className="flex items-center gap-4">
+              
+              {/* 1. INFO USUARIO (SIN CÁPSULA) */}
+              <div className="flex items-center gap-2">
                 <img
                   src="https://cdn-icons-png.freepik.com/512/12225/12225935.png"
                   alt='avatar'
-                  className="w-8 h-8 rounded-full"
+                  className="w-9 h-9 rounded-full border border-gray-200 shadow-sm"
                 />
-                <span>{user.username}</span>
+                {/* Nombre en negrita para que destaque sin fondo */}
+                <span className="hidden lg:block text-sm font-bold text-gray-700">
+                    {user.username || user.name}
+                </span>
               </div>
-            </>
+
+              {/* 2. BOTÓN CERRAR SESIÓN (LILA) */}
+              <Button onClick={signout}>
+                Cerrar sesión
+              </Button>
+
+            </div>
           )}
         </div>
 
         {/* BOTÓN MOBILE MENU */}
         <Button
-          className="sm:hidden h-8 w-8 p-1 flex items-center justify-center"
+          className="sm:hidden h-10 w-10 p-0 flex items-center justify-center bg-gray-100 text-gray-800 rounded-lg ml-auto"
           onClick={onOpenMobileMenu}
         >
-          ≡
+           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
         </Button>
 
       </div>
+      
+      {/* SEARCH MOBILE */}
+       <div className="sm:hidden w-full mt-2">
+          {search && (
+            <SearchBar
+              value={search.value}
+              onChange={search.onChange}
+              onSearch={search.onSearch}
+            />
+          )}
+        </div>
     </div>
   );
 }
