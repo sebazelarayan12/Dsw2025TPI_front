@@ -1,9 +1,15 @@
-function Card({ children, className }) {
+// Este archivo solo define cómo se ve UNA tarjeta.
+export default function Card({ children, className = "" }) {
   return (
-    <div className={`bg-white border border-gray-300 p-4 rounded-xl ${className}`}>
+    <div className={`
+      bg-white 
+      border-2 border-gray-200  /* El estilo borde negro que querías */
+      p-4 
+      rounded-xl 
+      shadow-sm
+      ${className}
+    `}>
       {children}
     </div>
   );
-};
-
-export default Card;
+}

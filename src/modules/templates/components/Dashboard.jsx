@@ -32,12 +32,15 @@ function Dashboard() {
   return (
     <div
       className="
-        h-full
+        h-screen       /* Cambié h-full por h-screen para asegurar altura completa */
+        bg-gray-100    /* Fondo gris para que se note la separación */
+        p-2 sm:p-4     /* <--- AQUÍ ESTÁ EL CAMBIO: Relleno para despegar del borde */
+        
         grid
         grid-cols-1
         grid-rows-[auto_1fr]
 
-        sm:gap-3
+        gap-3          /* Separación entre header, sidebar y main */
         sm:grid-cols-[256px_1fr]
       "
     >
@@ -48,7 +51,7 @@ function Dashboard() {
           justify-between
           p-4
           shadow
-          rounded
+          rounded-xl   /* Bordes más redondos */
           bg-white
 
           sm:col-span-2
@@ -67,6 +70,7 @@ function Dashboard() {
           onClick={() => setOpenMenu(!openMenu)}
         >{ openMenu ? <span>&#215;</span> : <span>&#9776;</span>}</button>
       </header>
+      
       <aside
         className={`
           absolute
@@ -77,14 +81,16 @@ function Dashboard() {
           p-4
           sm:p-6
           ${openMenu ? 'left-0' : 'left-[-256px]'}
-          rounded
+          rounded-xl    /* Bordes más redondos */
           shadow
           flex
           flex-col
           justify-between
+          z-50          /* Asegura que tape el contenido en móvil */
 
           sm:relative
           sm:left-0
+          sm:z-0
         `}
       >
         <nav>
@@ -114,9 +120,13 @@ function Dashboard() {
         </nav>
         {renderLogoutButton(true)}
       </aside>
+      
       <main
         className="
           p-5
+          bg-white      /* Fondo blanco para el contenido */
+          rounded-xl    /* Bordes redondos */
+          shadow        /* Sombra */
           overflow-y-scroll
         "
       >

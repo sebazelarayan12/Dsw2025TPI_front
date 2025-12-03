@@ -110,7 +110,7 @@ function CartPage() {
   }
 
   return (
-    <div>
+    <div className="container mx-auto p-4">
       {/* Header */}
       <Card>
         <UserHeaderMenu
