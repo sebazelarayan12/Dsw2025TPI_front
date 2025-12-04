@@ -29,12 +29,19 @@ function ListProductsPage() {
         setLoading(true);
         const { data, error } = await getProducts(searchTerm, status, pagination.pageNumber, pagination.pageSize);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error al buscar productos:', error);
+          pagination.setTotal(0);
+          setProducts([]);
+          return;
+        }
 
-        pagination.setTotal(data.total);
-        setProducts(data.productItems || []);
+        pagination.setTotal(data?.total || 0);
+        setProducts(data?.productItems || []);
       } catch (error) {
         console.error(error);
+        pagination.setTotal(0);
+        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -93,7 +100,8 @@ function ListProductsPage() {
         {
           loading
             ? <span>Buscando datos...</span>
-            : products.map(product => (
+            : products.length > 0
+            ? products.map(product => (
               <Card key={product.sku}>
                 <div className="flex justify-between items-center w-full">
                   <div>
@@ -108,6 +116,16 @@ function ListProductsPage() {
                 </div>
               </Card>
             ))
+            : (
+              <div className="text-center py-8">
+                <p className="text-gray-600 text-lg">No se encontraron productos</p>
+                {searchTerm && (
+                  <p className="text-gray-500 text-sm mt-2">
+                    Intenta con otro término de búsqueda
+                  </p>
+                )}
+              </div>
+            )
         }
       </div>
 

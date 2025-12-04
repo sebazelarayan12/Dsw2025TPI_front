@@ -61,10 +61,16 @@ function ListProductsUserPage() {
         pagination.pageNumber,
         pagination.pageSize
       );
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Error al buscar productos:', error);
+        pagination.setTotal(0);
+        setProducts([]);
+        return;
+      }
 
-      pagination.setTotal(data.total);
-      setProducts(data.productItems || []);
+      pagination.setTotal(data?.total || 0);
+      setProducts(data?.productItems || []);
     } finally {
       setLoading(false);
     }
@@ -122,7 +128,7 @@ function ListProductsUserPage() {
       >
         {loading ? (
           <span>Buscando productos...</span>
-        ) : (
+        ) : products.length > 0 ? (
           products.map((product) => {
             const qty = quantities[product.sku] || 1;
             const cartItem = cart.find((item) => item.sku === product.sku);
@@ -216,6 +222,15 @@ function ListProductsUserPage() {
               </Card>
             );
           })
+        ) : (
+          <div className="col-span-full text-center py-8">
+            <p className="text-gray-600 text-lg">No se encontraron productos</p>
+            {searchTerm && (
+              <p className="text-gray-500 text-sm mt-2">
+                Intenta con otro término de búsqueda
+              </p>
+            )}
+          </div>
         )}
       </div>
 

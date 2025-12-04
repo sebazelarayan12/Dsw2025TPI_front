@@ -1,4 +1,5 @@
 import { instance } from '../../shared/api/axiosInstance';
+import { handleApiCall } from '../../shared/helpers/apiHandler';
 
 export const getClientProducts = async (search = "", status = "enabled", pageNumber = 1, pageSize = 20) => {
   const queryString = new URLSearchParams({
@@ -8,7 +9,5 @@ export const getClientProducts = async (search = "", status = "enabled", pageNum
     pageSize,
   });
 
-  const response = await instance.get(`api/products?${queryString}`);
-
-  return { data: response.data, error: null };
+  return handleApiCall(() => instance.get(`api/products?${queryString}`));
 };
