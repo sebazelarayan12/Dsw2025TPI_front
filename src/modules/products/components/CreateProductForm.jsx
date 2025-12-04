@@ -59,16 +59,26 @@ function CreateProductForm() {
 
         <Input
           label='SKU'
+          placeholder='AAA123'
           error={errors.sku?.message}
           {...register('sku', {
             required: 'El SKU es obligatorio',
+            pattern: {
+              value: /^[A-Z]{3}\d{3}$/,
+              message: 'El SKU debe tener formato AAA123 (3 letras mayúsculas y 3 números)'
+            },
           })}
         />
         <Input
           label='Código Único'
+          placeholder='INT-123'
           error={errors.cui?.message}
           {...register('cui', {
             required: 'El código único es obligatorio',
+            pattern: {
+              value: /^INT-\d{3}$/,
+              message: 'El CUI debe tener formato INT-123'
+            },
           })}
         />
         <Input
