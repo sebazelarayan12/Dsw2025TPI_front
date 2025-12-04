@@ -19,7 +19,7 @@ function Home() {
         if (orderData) setTotalOrders(orderData.totalCount);
 
       } catch (err) {
-        console.error(err);
+        // Error manejado
       }
     };
 

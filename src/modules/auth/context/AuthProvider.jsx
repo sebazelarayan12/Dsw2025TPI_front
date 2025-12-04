@@ -7,28 +7,24 @@ const AuthContext = createContext();
 
 function AuthProvider({ children }) {
   
-  // 1. Inicializar estado del usuario desde localStorage
-  // (Esto permite mantener los datos al recargar la página)
+  // Inicializar estado del usuario desde localStorage
   const [user, setUser] = useState(() => {
     try {
       const storedUser = localStorage.getItem('user');
-      // Validación extra para evitar el string "undefined" que se guardó antes por error
+      // Validación extra para evitar el "undefined" 
       if (!storedUser || storedUser === "undefined") return null;
       return JSON.parse(storedUser);
     } catch (error) {
-      console.error("Error al leer usuario del storage", error);
       return null;
     }
   });
 
-  // 2. Inicializar estado de autenticación
+  // Inicializar estado de autenticación
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     const token = localStorage.getItem('token');
-    // Aquí podrías agregar validación de expiración si quisieras más seguridad
     return Boolean(token);
   });
 
-  // 3. Función de Inicio de Sesión (signIn)
   const signin = async (username, password) => {
     const { data, error } = await login(username, password);
 
@@ -44,13 +40,13 @@ function AuthProvider({ children }) {
 
       // Construimos el objeto de usuario basado en los datos del token
       const userData = {
-        // 'sub' es el claim estándar para el username/identificador
+        // sub es el claim estándar para el username
         username: decoded.sub, 
         
-        // 'id' es el claim personalizado que agregamos en el backend para el CustomerId
+        // id es el claim personalizado que agregamos en el backend para el CustomerId
         customerId: decoded.id, 
         
-        // Microsoft Identity usa esta URL larga para el claim de Rol
+        // Buscamos mil formas de usar el patron identity con el rol y necesitamos esta url
         role: decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || 'User'
       };
 
@@ -65,12 +61,11 @@ function AuthProvider({ children }) {
       return { error: null };
 
     } catch (e) {
-      console.error("Error al procesar el token de identidad:", e);
       return { error: { message: "Error de seguridad al procesar credenciales." } };
     }
   };
 
-  // 4. Función de Cerrar Sesión (signOut)
+
   const signout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -78,7 +73,7 @@ function AuthProvider({ children }) {
     setIsAuthenticated(false);
   };
 
-  // 5. Función de Registro
+ 
   const register = async (username, password, email, role, name) => {
     const { error } = await registerService(username, password, email, role, name);
     return { error: error || null };
@@ -89,8 +84,8 @@ function AuthProvider({ children }) {
       value={{
         isAuthenticated,
         user,
-        signin,   // Exportamos con nombre corregido
-        signout,  // Exportamos con nombre corregido
+        signin, 
+        signout, 
         register,
       }}
     >

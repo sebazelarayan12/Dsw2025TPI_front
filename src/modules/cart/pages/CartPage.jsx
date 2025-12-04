@@ -78,7 +78,6 @@ function CartPage() {
       clearCart();
       navigate('/');
     } catch (err) {
-      console.error(err);
       alert('Error al procesar la orden.');
     }
   };

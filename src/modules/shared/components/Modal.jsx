@@ -11,7 +11,6 @@ export default function Modal({ isOpen, onClose, children }) {
         className="bg-white p-6 rounded-lg w-11/12 max-w-md shadow-lg relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* BOTÓN DE CERRAR */}
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-xl hover:opacity-50"

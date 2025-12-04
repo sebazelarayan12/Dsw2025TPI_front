@@ -29,7 +29,6 @@ export default function SearchBar({ value, onChange, onSearch }) {
         "
       />
 
-      {/* BOTÓN LUPA - NEGRO TOTAL */}
       <button
         onClick={onSearch}
         className="

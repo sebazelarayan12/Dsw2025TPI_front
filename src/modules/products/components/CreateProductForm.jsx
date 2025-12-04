@@ -27,17 +27,17 @@ function CreateProductForm() {
   const navigate = useNavigate();
 
   const onValid = async (formData) => {
-    setBackendError(''); // Limpiar errores anteriores
+    setBackendError(''); // Limpiar errore
 
     const { data, error } = await createProduct(formData);
 
     if (error) {
-      // Mostrar el mensaje de error del backend directamente
+
       setBackendError(error.message || error.backendMessage || 'Error al crear el producto');
       return;
     }
 
-    // Éxito - redirigir
+   
     navigate('/admin/products');
   };
 
@@ -54,7 +54,6 @@ function CreateProductForm() {
         '
         onSubmit={handleSubmit(onValid)}
       >
-        {/* Banner de error del backend */}
         
 
         <Input

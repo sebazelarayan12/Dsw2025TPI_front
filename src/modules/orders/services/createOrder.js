@@ -5,7 +5,6 @@ export const createOrder = async (orderData) => {
     const { data } = await instance.post("/api/orders", orderData);
     return { data };
   } catch (error) {
-    console.error("Error creando la orden", error);
     return { error };
   }
 };

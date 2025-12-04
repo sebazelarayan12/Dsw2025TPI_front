@@ -8,7 +8,6 @@ function ProtectedRoute({ children, requiredRole }) {
     return <Navigate to='/login' />;
   }
 
-  // Si se requiere un rol específico y el usuario no lo tiene, redirigir a home
   if (requiredRole && user?.role !== requiredRole) {
     return <Navigate to='/' />;
   }

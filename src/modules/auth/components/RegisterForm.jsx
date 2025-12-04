@@ -6,7 +6,7 @@ import Button from '../../shared/components/Button';
 import { ErrorBanner } from '../../shared/components/ErrorBanner';
 import useAuth from '../hooks/useAuth';
 
-function RegisterForm({ onSuccess, fixedRole }) {
+function RegisterForm({ onSuccess }) {
   const [backendError, setBackendError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -129,23 +129,19 @@ function RegisterForm({ onSuccess, fixedRole }) {
         </select>
       </div>
 
-      {/* Mensaje de éxito */}
       {successMessage && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative text-center">
           <strong className="font-bold">✓ {successMessage}</strong>
         </div>
       )}
 
-      {/* Banner de error del backend */}
       <ErrorBanner 
         message={backendError} 
         onClose={() => setBackendError('')}
       />
 
-      {/* Botón principal */}
       <Button type="submit">Registrarse</Button>
 
-      {/* Botón volver */}
       {!onSuccess && (
         <Button type="button" onClick={() => navigate('/login')}>
           Iniciar Sesión

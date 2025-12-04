@@ -18,7 +18,7 @@ export default function UserHeaderMenu({
     <div className="mb-3">
       <div className="flex justify-between items-center py-2">
 
-        {/* --- LOGO --- */}
+        
         <div className="flex items-center gap-3 pr-4">
             <div className="bg-fuchsia-600 p-2 rounded-xl shadow-lg transform -rotate-3 hover:rotate-0 transition-all duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -31,7 +31,7 @@ export default function UserHeaderMenu({
             </h1>
         </div>
 
-        {/* SEARCH DESKTOP */}
+        
         <div className="hidden sm:flex flex-1 px-6 max-w-lg">
           {search && (
             <SearchBar
@@ -42,7 +42,7 @@ export default function UserHeaderMenu({
           )}
         </div>
 
-        {/* BOTONES DESKTOP */}
+        
         <div className="hidden sm:flex items-center gap-3">
           {onGoProducts && (
             <Button onClick={onGoProducts} className="bg-gray-100 text-gray-700 hover:bg-gray-200">
@@ -79,23 +79,23 @@ export default function UserHeaderMenu({
               <Button onClick={onOpenRegister}>Registrarse</Button>
             </>
           ) : (
-            // --- USUARIO LOGUEADO (LIMPIO) ---
+            
             <div className="flex items-center gap-4">
               
-              {/* 1. INFO USUARIO (SIN CÁPSULA) */}
+              
               <div className="flex items-center gap-2">
                 <img
                   src="https://cdn-icons-png.freepik.com/512/12225/12225935.png"
                   alt='avatar'
                   className="w-9 h-9 rounded-full border border-gray-200 shadow-sm"
                 />
-                {/* Nombre en negrita para que destaque sin fondo */}
+                
                 <span className="hidden lg:block text-sm font-bold text-gray-700">
                     {user?.username || user?.name || 'Usuario'}
                 </span>
               </div>
 
-              {/* 2. BOTÓN CERRAR SESIÓN (LILA) */}
+             
               <Button onClick={signout}>
                 Cerrar sesión
               </Button>
@@ -104,7 +104,7 @@ export default function UserHeaderMenu({
           )}
         </div>
 
-        {/* BOTÓN MOBILE MENU */}
+      
         <Button
           className="sm:hidden h-10 w-10 p-0 flex items-center justify-center bg-gray-100 text-gray-800 rounded-lg ml-auto"
           onClick={onOpenMobileMenu}
@@ -116,7 +116,7 @@ export default function UserHeaderMenu({
 
       </div>
       
-      {/* SEARCH MOBILE */}
+      
        <div className="sm:hidden w-full mt-2">
           {search && (
             <SearchBar

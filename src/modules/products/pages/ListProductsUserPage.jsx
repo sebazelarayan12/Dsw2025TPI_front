@@ -17,7 +17,7 @@ function ListProductsUserPage() {
 
   const navigate = useNavigate();
 
-  // PRODUCT STATE
+
   const [searchTerm, setSearchTerm] = useState("");
   const [status] = useState("enabled");
   const pagination = usePagination(10);
@@ -25,19 +25,18 @@ function ListProductsUserPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // CART
+
   const { cart, addToCart } = useCart();
   const [quantities, setQuantities] = useState({});
   const totalItems = cart.reduce((acc, p) => acc + p.quantity, 0);
 
-  // MOBILE MENU
+
   const [openCartMenu, setOpenCartMenu] = useState(false);
 
-  // MODALS
+
   const [openLoginModal, setOpenLoginModal] = useState(false);
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
 
-  // OPEN MODALS FROM EVENTS
   useEffect(() => {
     const openLogin = () => setOpenLoginModal(true);
     const openRegister = () => setOpenRegisterModal(true);
@@ -51,7 +50,7 @@ function ListProductsUserPage() {
     };
   }, []);
 
-  // FETCH PRODUCTS
+
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -63,7 +62,6 @@ function ListProductsUserPage() {
       );
       
       if (error) {
-        console.error('Error al buscar productos:', error);
         pagination.setTotal(0);
         setProducts([]);
         return;

@@ -1,13 +1,13 @@
 /**
  * Componente reutilizable de paginación
  * @param {object} props
- * @param {number} props.currentPage - Página actual
- * @param {number} props.totalPages - Total de páginas
- * @param {number} props.pageSize - Tamaño de página actual
- * @param {function} props.onPrevPage - Callback para ir a página anterior
- * @param {function} props.onNextPage - Callback para ir a página siguiente
- * @param {function} props.onPageSizeChange - Callback cuando cambia el tamaño de página
- * @param {array} props.pageSizeOptions - Opciones de tamaño de página (default: [2, 10, 15, 20])
+ * @param {number} props.currentPage 
+ * @param {number} props.totalPages
+ * @param {number} props.pageSize 
+ * @param {function} props.onPrevPage 
+ * @param {function} props.onNextPage 
+ * @param {function} props.onPageSizeChange 
+ * @param {array} props.pageSizeOptions
  */
 function Pagination({
   currentPage,

@@ -8,7 +8,7 @@ export default function LoginModal({ isOpen, onClose }) {
       <h2 className="text-2xl font-bold mb-4 text-center">Iniciar sesión</h2>
 
       <LoginForm
-        onSuccess={onClose}  // ← al logear cierra modal
+        onSuccess={onClose}
       />
 
       <p className="text-center text-sm mt-4">
@@ -16,8 +16,8 @@ export default function LoginModal({ isOpen, onClose }) {
         <button
           className="text-blue-600 ml-1"
           onClick={() => {
-            onClose();            // cerramos login
-            window.dispatchEvent(new Event('open-register')); // abrimos register
+            onClose();
+            window.dispatchEvent(new Event('open-register'));
           }}
         >
           Regístrate

@@ -34,7 +34,6 @@ export const getOrders = async (customerId = null, status = null, pageNumber = 1
       const items = data?.items || data?.results || data || [];
       return { data: Array.isArray(items) ? items : [], error: null };
     } catch (error) {
-      console.error('Error al listar órdenes:', error);
       return { data: [], error };
     }
   }

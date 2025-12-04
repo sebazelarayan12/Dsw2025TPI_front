@@ -35,7 +35,7 @@ function ListOrdersPage() {
       pagination.setTotal(data.totalCount);      
     setOrders(data.items ?? []);
     } catch (error) {
-      console.error(error);
+      // Error manejado
     } finally {
       setLoading(false);
     }
