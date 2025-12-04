@@ -34,6 +34,8 @@ export const handleApiCall = async (apiCall) => {
         return e.description || e.message || e;
       }).join(', ');
     }
+
+    // manejo de errores del modelstate
     else if (data?.errors && typeof data.errors === 'object') {
       const firstErrorKey = Object.keys(data.errors)[0];
       const firstError = data.errors[firstErrorKey];

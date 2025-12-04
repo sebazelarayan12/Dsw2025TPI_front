@@ -7,7 +7,6 @@ export default function SearchBar({ value, onChange, onSearch }) {
 
   return (
     <div className="relative w-full max-w-md mx-auto">
-      {/* INPUT */}
       <input
         type="text"
         placeholder="Buscar..."
